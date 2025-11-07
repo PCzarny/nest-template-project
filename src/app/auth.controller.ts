@@ -1,10 +1,7 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
-import type {
-  LoginDto,
-  LoginResponse,
-  LoggedInUser,
-} from '../auth/auth.interface';
+import type { LoginResponse, LoggedInUser } from '../auth/auth.interface';
+import { LoginDto } from '../auth/dto/login.dto';
 import { CurrentUser, Public } from '../auth/auth.decorator';
 
 @Controller('auth')
