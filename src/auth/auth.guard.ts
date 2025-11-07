@@ -9,12 +9,14 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { TokenPayload } from './auth.interface';
 import { IS_PUBLIC_KEY } from './auth.decorator';
+import { UsersRepo } from 'src/users/users.repo';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private reflector: Reflector,
+    private usersRepo: UsersRepo,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -35,7 +37,18 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync<TokenPayload>(token, {
         secret: process.env.JWT_SECRET,
       });
-      request.user = payload;
+      const user = await this.usersRepo.findById(payload.sub);
+
+      if (!user) {
+        throw new Error(`User with id ${payload.sub} not found`);
+      }
+
+      request.user = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
     } catch {
       throw new UnauthorizedException('Invalid token');
     }

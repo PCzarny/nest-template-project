@@ -28,4 +28,8 @@ export class UsersRepo {
       omit: { password: false },
     });
   }
+
+  async findById(id: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { id } });
+  }
 }

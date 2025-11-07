@@ -3,7 +3,7 @@ import { AuthService } from '../auth/auth.service';
 import type {
   LoginDto,
   LoginResponse,
-  TokenPayload,
+  LoggedInUser,
 } from '../auth/auth.interface';
 import { CurrentUser, Public } from '../auth/auth.decorator';
 
@@ -18,7 +18,7 @@ export class AuthController {
   }
 
   @Get('profile')
-  getProfile(@CurrentUser() user: TokenPayload) {
+  getProfile(@CurrentUser() user: LoggedInUser) {
     return user;
   }
 }
