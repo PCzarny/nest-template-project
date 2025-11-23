@@ -30,6 +30,15 @@ $ yarn run start:dev
 $ yarn run start:prod
 ```
 
+## Migrations
+
+Create migration
+
+```bash
+$ yarn prisma migrate dev --name <migration_name> --create-only
+$ yarn prisma migrate deploy
+```
+
 ## Run tests
 
 ```bash
