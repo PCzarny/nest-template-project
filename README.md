@@ -37,6 +37,7 @@ Create migration
 ```bash
 $ yarn prisma migrate dev --name <migration_name> --create-only
 $ yarn prisma migrate deploy
+$ yarn prisma generate
 ```
 
 ## Run tests
