@@ -1,0 +1,30 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Role } from 'generated/prisma';
+
+export class UserResponseDto {
+  @ApiProperty({
+    description: 'User ID',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  id!: string;
+
+  @ApiProperty({
+    description: 'User email address',
+    example: 'user@example.com',
+  })
+  email!: string;
+
+  @ApiProperty({
+    description: 'User name',
+    example: 'John Doe',
+    nullable: true,
+  })
+  name!: string | null;
+
+  @ApiProperty({
+    description: 'User role',
+    enum: Role,
+    example: Role.VIEWER,
+  })
+  role!: Role;
+}
