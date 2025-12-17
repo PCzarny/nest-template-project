@@ -1,0 +1,8 @@
+generated
+node_modules
+dist
+*.log
+*.md
+.git
+
+.env*

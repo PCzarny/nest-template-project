@@ -1,0 +1,63 @@
+name: Deploy to Cloud Run
+
+env:
+  SERVICE_NAME: nest-template-project
+  REPOSITORY_NAME: nest-template-project
+  GCP_REGION: europe-west1
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  dockerize-and-deploy:
+    name: Build, and Deploy to Google Cloud Run
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Google Cloud Auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v3'
+
+      - name: Authenticate Docker to Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
+
+      - name: Set image name
+        id: image
+        run: |
+          IMAGE_NAME="${{ env.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+          echo "IMAGE_NAME=${IMAGE_NAME}" >> $GITHUB_ENV
+          echo "Image will be: ${IMAGE_NAME}"
+
+      - name: Build the Docker image
+        run: |
+          docker build \
+            --build-arg DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            -t ${{ env.IMAGE_NAME }} \
+            -f Dockerfile .
+
+      - name: Push to Registry
+        run: docker push ${{ env.IMAGE_NAME }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo SERVICE_NAME $SERVICE_NAME
+          gcloud run deploy $SERVICE_NAME \
+            --image ${{ env.IMAGE_NAME }} \
+            --platform managed \
+            --region ${{ env.GCP_REGION }} \
+            --port=3000 \
+            --allow-unauthenticated \
+            --set-env-vars="NODE_ENV=production" \
+            --set-secrets="DATABASE_URL=DATABASE_URL:latest,JWT_SECRET=JWT_SECRET:latest,MONGO_URI=MONGO_URI:latest" \
+            --service-account=cloud-run-sa@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com
