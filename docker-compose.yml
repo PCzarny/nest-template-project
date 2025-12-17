@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:17
-    container_name: nest-template-project
+    container_name: nest-template-project-postgres
     ports:
       - '5432:5432'
     environment:
@@ -12,7 +12,16 @@ services:
       POSTGRES_DB: nest-template-project
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  mongo:
+    image: mongodb/mongodb-community-server:latest
+    container_name: nest-template-project-mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
 
 volumes:
   postgres_data:
+    driver: local
+  mongo_data:
     driver: local
