@@ -4,6 +4,7 @@ env:
   SERVICE_NAME: nest-template-project
   REPOSITORY_NAME: nest-template-project
   GCP_REGION: europe-west1
+  NODE_VERSION: 24.11
 
 on:
   push:
@@ -11,6 +12,65 @@ on:
       - main
 
 jobs:
+  install-node:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install
+        run: yarn install
+      # - name: Rerun Install
+      #   run: yarn install
+
+  # generate:
+  #   runs-on: ubuntu-latest
+
+  #   needs: install-node
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: Setup Nodejs
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         node-version: ${{ env.NODE_VERSION }}
+  #         cache: "yarn"
+
+  #     - name: Install
+  #       run: yarn install
+
+  #     - run: rm -rf node_modules/.prisma
+
+  #     - name: Generate Prisma Client
+  #       run: npx prisma generate
+
+  migrate:
+    runs-on: ubuntu-latest
+
+    needs: install-node
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install
+        run: yarn install
+
+      - name: Deploy Migrations
+        run: yarn prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
   dockerize-and-deploy:
     name: Build, and Deploy to Google Cloud Run
     runs-on: ubuntu-latest
@@ -24,6 +84,25 @@ jobs:
         with:
           credentials_json: '${{ secrets.GCP_SA_KEY }}'
           project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Run DB Migration
+        id: db_migration
+        run: |
+          # Run dry run first
+          echo "Running dry run..."
+          prisma migrate dev --preview-feature --dry-run
+          echo "Dry run complete. Do you want to proceed with the migration? (y/n)"
+
+          # Wait for user input and approval
+          read -r -p "Enter 'y' to proceed: " userInput
+          if [[ "$userInput" == "y" ]]; then
+            echo "Proceeding with the migration..."
+            prisma migrate dev --preview-feature
+            echo "Migration complete. Deploying app..."
+            # Add your deployment step here
+          else
+            echo "Migration cancelled."
+          fi
 
       - name: Set up Cloud SDK
         uses: 'google-github-actions/setup-gcloud@v3'
