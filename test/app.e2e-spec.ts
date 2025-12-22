@@ -1,8 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getConnectionToken } from '@nestjs/mongoose';
 import { INestApplication } from '@nestjs/common';
+import { Connection } from 'mongoose';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from 'src/app/app.module';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
@@ -14,6 +17,15 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+  });
+
+  afterEach(async () => {
+    const prisma = app.get<PrismaService>(PrismaService);
+    const mongoConnection = app.get<Connection>(getConnectionToken());
+
+    await Promise.all([prisma.$disconnect(), mongoConnection.close()]);
+
+    await app.close();
   });
 
   it('/ (GET)', () => {
