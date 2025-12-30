@@ -24,10 +24,10 @@ $ cp .env.example .env # And fill .env file with proper values
 $ yarn run start
 
 # watch mode
-$ yarn run start:dev
+$ yarn run start:dev:api
 
 # production mode
-$ yarn run start:prod
+$ yarn run start:prod:api
 ```
 
 ## Migrations

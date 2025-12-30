@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
 import { RabbitConsumerModule } from './../src/rabbit-consumer.module';
 
 describe('RabbitConsumerController (e2e)', () => {
@@ -15,10 +14,9 @@ describe('RabbitConsumerController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  it('should starts', () => {
+    // There is no HTTP endpoint exposed—this app is meant to consume messages from RabbitMQ.
+    // Here we just assert that the app starts up correctly.
+    expect(app).toBeDefined();
   });
 });

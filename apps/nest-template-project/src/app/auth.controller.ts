@@ -6,12 +6,18 @@ import {
   ApiBearerAuth,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AuthService } from 'src/auth/auth.service';
-import type { LoginResponse, LoggedInUser } from 'src/auth/auth.interface';
-import { LoginDto } from 'src/auth/dto/login.dto';
-import { LoginResponseDto } from 'src/auth/dto/login-response.dto';
-import { LoggedInUserDto } from 'src/auth/dto/logged-in-user.dto';
-import { CurrentUser, Public } from 'src/auth/auth.decorator';
+import { AuthService } from 'apps/nest-template-project/src/auth/auth.service';
+import type {
+  LoginResponse,
+  LoggedInUser,
+} from 'apps/nest-template-project/src/auth/auth.interface';
+import { LoginDto } from 'apps/nest-template-project/src/auth/dto/login.dto';
+import { LoginResponseDto } from 'apps/nest-template-project/src/auth/dto/login-response.dto';
+import { LoggedInUserDto } from 'apps/nest-template-project/src/auth/dto/logged-in-user.dto';
+import {
+  CurrentUser,
+  Public,
+} from 'apps/nest-template-project/src/auth/auth.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')

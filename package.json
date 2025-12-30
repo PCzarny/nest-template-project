@@ -6,27 +6,40 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
+    "lint": "eslint \"{apps,libs}/**/*.ts\" --fix",
+    
+    "build": "nest build",
+    "build:api": "nest build nest-template-project",
+    "build:rabbit-consumer": "nest build rabbit-consumer",
+    
     "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/apps/nest-template-project/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "start:prod:api": "NODE_ENV=production yarn prisma generate && node dist/apps/nest-template-project/main",
+    "start:prod:rabbit-consumer": "node dist/apps/rabbit-consumer/main",
+    
+    "start:debug:api": "nest start nest-template-project --debug --watch",
+    "start:dev:api": "nest start nest-template-project --watch",
+    "start:dev:rabbit-consumer": "nest start rabbit-consumer --watch",
+    
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/nest-template-project/test/jest-e2e.json"
+    "test:e2e": "yarn test:e2e:api",
+    "test:e2e:api": "jest --config ./apps/nest-template-project/test/jest-e2e.json",
+    "test:e2e:rabbit-consumer": "jest --config ./apps/rabbit-consumer/test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.1",
+    "@nestjs/microservices": "^11.0.1",
     "@nestjs/mongoose": "^11.0.4",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.1",
     "@prisma/client": "^6.19.0",
+    "amqplib": "^0.10.3",
+    "amqp-connection-manager": "^4.1.14",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
@@ -41,6 +54,7 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
+    "@types/amqplib": "^0.10.4",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
@@ -79,8 +93,8 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^src/(.*)$": "<rootDir>/$1",
-      "^generated/(.*)$": "<rootDir>/../generated/$1"
+      "^apps/(.*)$": "<rootDir>/apps/$1",
+      "^generated/(.*)$": "<rootDir>/generated/$1"
     },
     "roots": [
       "<rootDir>/apps/"

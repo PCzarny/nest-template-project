@@ -4,8 +4,8 @@ import { INestApplication } from '@nestjs/common';
 import { Connection } from 'mongoose';
 import request from 'supertest';
 import { App } from 'supertest/types';
-import { AppModule } from 'src/app/app.module';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { AppModule } from 'apps/nest-template-project/src/app/app.module';
+import { PrismaService } from 'apps/nest-template-project/src/prisma/prisma.service';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;

@@ -18,8 +18,11 @@
       "generated/*": [
         "./generated/*"
       ],
-      "src/*": [
-        "./src/*"
+      "apps/*": [
+        "./apps/*"
+      ],
+      "libs/*": [
+        "./libs/*"
       ]
     },
     "incremental": true,

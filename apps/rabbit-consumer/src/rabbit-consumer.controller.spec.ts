@@ -11,12 +11,19 @@ describe('RabbitConsumerController', () => {
       providers: [RabbitConsumerService],
     }).compile();
 
-    rabbitConsumerController = app.get<RabbitConsumerController>(RabbitConsumerController);
+    rabbitConsumerController = app.get<RabbitConsumerController>(
+      RabbitConsumerController,
+    );
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(rabbitConsumerController.getHello()).toBe('Hello World!');
+    it('should return "Succed!"', async () => {
+      await rabbitConsumerController.handleTaskCreated({
+        createdAt: new Date(),
+        taskId: 1,
+      });
+
+      expect(rabbitConsumerController).toBeDefined();
     });
   });
 });

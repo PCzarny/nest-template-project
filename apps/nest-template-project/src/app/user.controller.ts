@@ -10,7 +10,10 @@ import {
 import { UsersRepo } from '../users/users.repo';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UserResponseDto } from '../users/dto/user-response.dto';
-import { RequirePermissions, Permission } from 'src/auth/permissions.decorator';
+import {
+  RequirePermissions,
+  Permission,
+} from 'apps/nest-template-project/src/auth/permissions.decorator';
 
 @ApiTags('Users')
 @Controller('users')

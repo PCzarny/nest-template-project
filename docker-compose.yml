@@ -19,9 +19,27 @@ services:
       - '27017:27017'
     volumes:
       - mongo_data:/data/db
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: nest-template-project-rabbitmq
+    ports:
+      - '5672:5672' # AMQP port
+      - '15672:15672' # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   postgres_data:
     driver: local
   mongo_data:
+    driver: local
+  rabbitmq_data:
     driver: local

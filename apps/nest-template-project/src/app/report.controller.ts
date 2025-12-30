@@ -19,16 +19,23 @@ import {
   ApiForbiddenResponse,
   ApiParam,
 } from '@nestjs/swagger';
-import { RequirePermissions, Permission } from 'src/auth/permissions.decorator';
+import {
+  RequirePermissions,
+  Permission,
+} from 'apps/nest-template-project/src/auth/permissions.decorator';
 import { ReportsRepo } from '../reports/reports.repo';
 import { CreateReportDto } from '../reports/dto/create-report.dto';
 import { UpdateReportDto } from '../reports/dto/update-report.dto';
 import { ReportResponseDto } from '../reports/dto/report-response.dto';
+import { ReportsService } from '../reports/reports.service';
 
 @ApiTags('Reports')
 @Controller('reports')
 export class ReportController {
-  constructor(private readonly reportsRepo: ReportsRepo) {}
+  constructor(
+    private readonly reportsRepo: ReportsRepo,
+    private readonly reportsService: ReportsService,
+  ) {}
 
   @Post()
   @ApiBearerAuth('JWT-auth')
@@ -46,7 +53,7 @@ export class ReportController {
   async createReport(
     @Body() createReportDto: CreateReportDto,
   ): Promise<ReportResponseDto> {
-    return this.reportsRepo.createReport(createReportDto);
+    return this.reportsService.createReport(createReportDto);
   }
 
   @Get()

@@ -1,0 +1,19 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { InjectionTokens } from './consts';
+import { ReportsRepo } from './reports.repo';
+import { CreateReportDto } from './dto/create-report.dto';
+import { TReport } from './reports.interface';
+
+@Injectable()
+export class ReportsService {
+  constructor(
+    @Inject(InjectionTokens.RABBITMQ_SERVICE) private client: ClientProxy,
+    private reportsRepo: ReportsRepo,
+  ) {}
+
+  async createReport(data: CreateReportDto): Promise<TReport> {
+    this.client.emit('task_created', { createdAt: new Date(), taskId: 1 });
+    return this.reportsRepo.createReport(data);
+  }
+}
