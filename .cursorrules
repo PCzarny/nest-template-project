@@ -1,0 +1,158 @@
+# Cursor Rules for Nest Template Project
+
+## Architecture Decision Records (ADR)
+
+When creating or modifying Architecture Decision Records, follow these guidelines:
+
+### Location and Naming
+
+- All ADRs must be stored in `doc/adr/` directory
+- File naming convention: `NNNN-short-descriptive-title.md` (e.g., `0001-monorepo-architecture-decision.md`)
+- Use sequential numbering (0001, 0002, 0003, etc.)
+- Use kebab-case for the title part of the filename
+
+### Language
+
+- **All ADRs must be written in English**
+- All sections, titles, descriptions, and content must be in English
+- Code comments in examples can be in English
+
+### Required Structure
+
+Every ADR must follow this structure:
+
+```markdown
+# ADR-NNNN: Short Descriptive Title
+
+## Status History
+
+- `Proposed` (YYYY-MM-DD)
+- `Accepted` (YYYY-MM-DD)
+- [Additional status changes with dates]
+
+## Context
+
+[Description of the situation and requirements]
+
+## Decision Drivers
+
+- **Driver 1**: Description
+- **Driver 2**: Description
+
+## Considered Options
+
+### Option 1: [Option Name]
+
+[Description]
+
+**Advantages:**
+
+- ✅ Advantage 1
+- ✅ Advantage 2
+
+**Disadvantages:**
+
+- ⚠️ Disadvantage 1
+- ⚠️ Disadvantage 2
+
+[Additional sections: Structure, Configuration example, CI/CD, etc.]
+
+### Option 2: [Option Name]
+
+[Similar structure]
+
+## Decision Outcome
+
+**Chosen option: Option X - [Option Name]**
+
+### Rationale
+
+[Detailed explanation of why this option was chosen]
+
+### Implementation
+
+[Implementation details and steps]
+
+### Consequences
+
+**Positive:**
+
+- ✅ Positive consequence 1
+
+**Negative:**
+
+- ⚠️ Negative consequence 1
+
+**Risks:**
+
+- Risk: Description - **Mitigation**: How to mitigate
+
+## References
+
+- [Link 1](url)
+- [Link 2](url)
+
+## Notes
+
+[Additional notes, future considerations, etc.]
+```
+
+### Status Values
+
+Use one of these status values:
+
+- `Proposed` - Initial proposal, under discussion
+- `Accepted` - Decision has been made and approved
+- `Deprecated` - Decision is no longer valid
+- `Superseded` - Replaced by another ADR (include reference to new ADR)
+
+### Status and Date Requirements
+
+- **Status History**: Must maintain a chronological list of all status changes with dates
+- **Date Format**: Use ISO 8601 format (YYYY-MM-DD) for all dates
+- **Status History Format**: Each entry should follow: `- \`Status\` (YYYY-MM-DD)`
+- **Initial Entry**: When creating a new ADR, it should start with `Proposed` status and the creation date
+- **Status Updates**: When changing status, add a new entry to Status History with the date and reason (if significant)
+- **Never Remove History**: Always append to Status History, never remove or modify previous entries
+
+### Formatting Guidelines
+
+- Use markdown formatting consistently
+- Use emoji checkmarks (✅) for advantages/positive items
+- Use warning emoji (⚠️) for disadvantages/negative items/risks
+- Use code blocks with language specification for code examples
+- Use proper heading hierarchy (## for main sections, ### for subsections)
+- Keep lines under 100 characters when possible (except for code blocks)
+
+### Content Guidelines
+
+- **Context**: Clearly describe the problem or situation that requires a decision
+- **Decision Drivers**: List the key factors influencing the decision (technical, business, team, etc.)
+- **Considered Options**: Provide at least 2-3 viable alternatives with balanced pros/cons
+- **Decision Outcome**: Clearly state the chosen option with detailed rationale
+- **Consequences**: Be honest about both positive and negative impacts
+- **References**: Include links to relevant documentation, articles, or resources
+
+### When to Create an ADR
+
+Create an ADR when making decisions about:
+
+- Architecture patterns and structures
+- Technology choices (frameworks, libraries, tools)
+- Infrastructure and deployment strategies
+- Data storage and persistence
+- API design and integration patterns
+- Security approaches
+- Development workflow and tooling
+- Any decision that will have long-term impact on the codebase
+
+### Review Process
+
+- ADRs should be reviewed by the team before being marked as `Accepted`
+- When updating status:
+  1. Update the current status with the new date
+  2. Add a new entry to Status History with the date and reason for the change
+  3. Never remove or modify existing Status History entries
+- Link related ADRs in the References or Notes section
+- When an ADR is superseded, update its status with the date and reference the new ADR in Status History
+- Include brief context in Status History entries when the reason for change is significant (e.g., "Decision approved after team review", "Superseded by ADR-0002 due to new requirements")
