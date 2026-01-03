@@ -15,6 +15,6 @@ export class RabbitConsumerController {
 
   @EventPattern('task_created')
   async handleTaskCreated(@Payload() data: any) {
-    await this.rabbitConsumerService.handleTaskCreated(data);
+    return this.rabbitConsumerService.handleTaskCreated(data);
   }
 }

@@ -4,7 +4,6 @@ env:
   REPOSITORY_NAME: nest-template-project
   GCP_REGION: europe-west1
   NODE_VERSION: 24.11
-  YARN_CACHE_FOLDER: .yarn/cache
 
 on:
   push:
@@ -205,7 +204,7 @@ jobs:
       - name: Set services JSON
         id: set-services
         run: |
-          SERVICES='[{"name":"nest-template-project","docker_target":"http-service","port":3000,"allow_unauthenticated":true,"secrets":"DATABASE_URL:latest,JWT_SECRET:latest,MONGO_URI:latest,RABBITMQ_URL:latest","env_vars":"NODE_ENV=production","min_instances":0,"max_instances":3},{"name":"rabbit-consumer","docker_target":"rabbit-consumer","port":3001,"allow_unauthenticated":false,"secrets":"DATABASE_URL:latest,RABBITMQ_URL:latest","env_vars":"NODE_ENV=production","min_instances":0,"max_instances":3,"cpu":1,"memory":"512Mi","health_check_path":"/health"}]'
+          SERVICES='[{"name":"nest-template-project","docker_target":"http-service","port":3000,"allow_unauthenticated":true,"secrets":"DATABASE_URL=DATABASE_URL:latest,JWT_SECRET=JWT_SECRET:latest,MONGO_URI=MONGO_URI:latest,RABBITMQ_URL=RABBITMQ_URL:latest","env_vars":"NODE_ENV=production,RABBITMQ_QUEUE=${{ vars.RABBITMQ_QUEUE }}","min_instances":0,"max_instances":3},{"name":"rabbit-consumer","docker_target":"rabbit-consumer","port":3001,"allow_unauthenticated":false,"secrets":"DATABASE_URL=DATABASE_URL:latest,RABBITMQ_URL=RABBITMQ_URL:latest","env_vars":"NODE_ENV=production,RABBITMQ_QUEUE=${{ vars.RABBITMQ_QUEUE }}","min_instances":0,"max_instances":3,"cpu":1,"memory":"512Mi"}]'
           echo "services=${SERVICES}" >> $GITHUB_OUTPUT
           echo "Services configured: ${SERVICES}"
 
@@ -283,41 +282,38 @@ jobs:
           IMAGE_NAME="${{ env.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ env.REPOSITORY_NAME }}/${{ matrix.service.name }}:${{ github.sha }}"
 
           # Build base command
-          CMD="gcloud run deploy ${{ matrix.service.name }} \
-            --image ${IMAGE_NAME} \
-            --platform managed \
-            --region ${{ env.GCP_REGION }} \
-            --port=${{ matrix.service.port }} \
-            --set-env-vars=\"${{ matrix.service.env_vars }}\" \
-            --set-secrets=\"${{ matrix.service.secrets }}\" \
-            --service-account=cloud-run-sa@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
-            --min-instances=${{ matrix.service.min_instances }} \
-            --max-instances=${{ matrix.service.max_instances }}"
+          DEPLOY_ARGS=(
+            "gcloud" "run" "deploy" "${{ matrix.service.name }}"
+            "--image" "${IMAGE_NAME}"
+            "--platform" "managed"
+            "--region" "${{ env.GCP_REGION }}"
+            "--port=${{ matrix.service.port }}"
+            "--set-env-vars=${{ matrix.service.env_vars }}"
+            "--set-secrets=${{ matrix.service.secrets }}"
+            "--service-account=cloud-run-sa@${{ vars.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
+            "--min-instances=${{ matrix.service.min_instances }}"
+            "--max-instances=${{ matrix.service.max_instances }}"
+          )
 
           # Add authentication flag
           if [ "${{ matrix.service.allow_unauthenticated }}" = "true" ]; then
-            CMD="${CMD} --allow-unauthenticated"
+            DEPLOY_ARGS+=("--allow-unauthenticated")
           else
-            CMD="${CMD} --no-allow-unauthenticated"
+            DEPLOY_ARGS+=("--no-allow-unauthenticated")
           fi
 
           # Add optional CPU if specified
           if [ -n "${{ matrix.service.cpu }}" ] && [ "${{ matrix.service.cpu }}" != "null" ]; then
-            CMD="${CMD} --cpu=${{ matrix.service.cpu }}"
+            DEPLOY_ARGS+=("--cpu=${{ matrix.service.cpu }}")
           fi
 
           # Add optional memory if specified
           if [ -n "${{ matrix.service.memory }}" ] && [ "${{ matrix.service.memory }}" != "null" ]; then
-            CMD="${CMD} --memory=${{ matrix.service.memory }}"
-          fi
-
-          # Add optional health check path if specified
-          if [ -n "${{ matrix.service.health_check_path }}" ] && [ "${{ matrix.service.health_check_path }}" != "null" ]; then
-            CMD="${CMD} --health-check-path=${{ matrix.service.health_check_path }}"
+            DEPLOY_ARGS+=("--memory=${{ matrix.service.memory }}")
           fi
 
           # Execute command
-          eval $CMD
+          "${DEPLOY_ARGS[@]}"
 
       - name: Output service URL
         run: |
