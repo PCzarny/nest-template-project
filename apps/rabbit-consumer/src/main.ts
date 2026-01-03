@@ -7,23 +7,32 @@ import { RabbitConsumerModule } from './rabbit-consumer.module';
 async function bootstrap() {
   const logger = new ConsoleLogger('RabbitConsumer', { json: true });
 
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    RabbitConsumerModule,
-    {
-      transport: Transport.RMQ,
-      options: {
-        urls: [process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672'],
-        queue: process.env.RABBITMQ_QUEUE || 'default_queue',
-        queueOptions: {
-          durable: true,
-        },
-        prefetchCount: 1,
-      },
-      logger,
-    },
-  );
+  // Create hybrid application: HTTP server + Microservice
+  const app = await NestFactory.create(RabbitConsumerModule, {
+    logger,
+  });
 
-  await app.listen();
-  logger.log('RabbitMQ Consumer microservice is listening');
+  // Connect RabbitMQ microservice
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672'],
+      queue: process.env.RABBITMQ_QUEUE || 'default_queue',
+      queueOptions: {
+        durable: true,
+      },
+      prefetchCount: 1,
+    },
+  });
+
+  // Start all microservices
+  await app.startAllMicroservices();
+
+  // Start HTTP server for health checks
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+
+  logger.log(`RabbitMQ Consumer microservice is listening on port ${port}`);
+  logger.log('RabbitMQ Consumer microservice connected');
 }
 bootstrap();

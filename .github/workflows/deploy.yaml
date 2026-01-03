@@ -205,7 +205,7 @@ jobs:
       - name: Set services JSON
         id: set-services
         run: |
-          SERVICES='[{"name":"nest-template-project","docker_target":"http-service","port":3000,"allow_unauthenticated":true,"secrets":"DATABASE_URL:latest,JWT_SECRET:latest,MONGO_URI:latest,RABBITMQ_URL:latest","env_vars":"NODE_ENV=production","min_instances":0,"max_instances":3},{"name":"rabbit-consumer","docker_target":"rabbit-consumer","port":3001,"allow_unauthenticated":false,"secrets":"DATABASE_URL:latest,RABBITMQ_URL:latest","env_vars":"NODE_ENV=production","min_instances":0,"max_instances":3,"cpu":1,"memory":"512Mi"}]'
+          SERVICES='[{"name":"nest-template-project","docker_target":"http-service","port":3000,"allow_unauthenticated":true,"secrets":"DATABASE_URL:latest,JWT_SECRET:latest,MONGO_URI:latest,RABBITMQ_URL:latest","env_vars":"NODE_ENV=production","min_instances":0,"max_instances":3},{"name":"rabbit-consumer","docker_target":"rabbit-consumer","port":3001,"allow_unauthenticated":false,"secrets":"DATABASE_URL:latest,RABBITMQ_URL:latest","env_vars":"NODE_ENV=production","min_instances":0,"max_instances":3,"cpu":1,"memory":"512Mi","health_check_path":"/health"}]'
           echo "services=${SERVICES}" >> $GITHUB_OUTPUT
           echo "Services configured: ${SERVICES}"
 
@@ -309,6 +309,11 @@ jobs:
           # Add optional memory if specified
           if [ -n "${{ matrix.service.memory }}" ] && [ "${{ matrix.service.memory }}" != "null" ]; then
             CMD="${CMD} --memory=${{ matrix.service.memory }}"
+          fi
+
+          # Add optional health check path if specified
+          if [ -n "${{ matrix.service.health_check_path }}" ] && [ "${{ matrix.service.health_check_path }}" != "null" ]; then
+            CMD="${CMD} --health-check-path=${{ matrix.service.health_check_path }}"
           fi
 
           # Execute command
